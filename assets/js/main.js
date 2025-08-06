@@ -226,4 +226,46 @@
   window.addEventListener('load', navmenuScrollspy);
   document.addEventListener('scroll', navmenuScrollspy);
 
+  document.addEventListener('DOMContentLoaded', function() {
+    const form = document.querySelector('.php-email-form');
+    
+    if (form) {
+      form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const loading = form.querySelector('.loading');
+        const errorMessage = form.querySelector('.error-message');
+        const sentMessage = form.querySelector('.sent-message');
+        
+        // Show loading
+        loading.style.display = 'block';
+        errorMessage.style.display = 'none';
+        sentMessage.style.display = 'none';
+
+        fetch(form.action, {
+          method: 'POST',
+          body: new FormData(form),
+          headers: {
+            'Accept': 'application/json'
+          }
+        })
+        .then(response => response.json())
+        .then(data => {
+          loading.style.display = 'none';
+          
+          if (data.ok) {
+            sentMessage.style.display = 'block';
+            form.reset();
+          } else {
+            throw new Error('Form submission failed');
+          }
+        })
+        .catch(error => {
+          loading.style.display = 'none';
+          errorMessage.style.display = 'block';
+        });
+      });
+    }
+  });
+
 })();
