@@ -226,44 +226,42 @@
   window.addEventListener('load', navmenuScrollspy);
   document.addEventListener('scroll', navmenuScrollspy);
 
+  // Form handling
   document.addEventListener('DOMContentLoaded', function() {
     const form = document.querySelector('.php-email-form');
     
     if (form) {
-      form.addEventListener('submit', function(e) {
+      form.addEventListener('submit', async function(e) {
         e.preventDefault();
         
         const loading = form.querySelector('.loading');
         const errorMessage = form.querySelector('.error-message');
         const sentMessage = form.querySelector('.sent-message');
         
-        // Show loading
         loading.style.display = 'block';
         errorMessage.style.display = 'none';
         sentMessage.style.display = 'none';
 
-        fetch(form.action, {
-          method: 'POST',
-          body: new FormData(form),
-          headers: {
-            'Accept': 'application/json'
-          }
-        })
-        .then(response => response.json())
-        .then(data => {
-          loading.style.display = 'none';
-          
-          if (data.ok) {
-            sentMessage.style.display = 'block';
+        try {
+          const response = await fetch(form.action, {
+            method: 'POST',
+            body: new FormData(form),
+            headers: {
+              'Accept': 'application/json'
+            }
+          });
+
+          if (response.ok) {
             form.reset();
+            loading.style.display = 'none';
+            sentMessage.style.display = 'block';
           } else {
             throw new Error('Form submission failed');
           }
-        })
-        .catch(error => {
+        } catch (error) {
           loading.style.display = 'none';
           errorMessage.style.display = 'block';
-        });
+        }
       });
     }
   });
